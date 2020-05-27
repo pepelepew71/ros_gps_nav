@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<launch>
+
+    <!-- # gps navigation -->
+    <node pkg="ros_gps_nav" name="gps_nav_node" type="gps_nav_node.py" clear_params="true" output="screen">
+        <param name="topic_gps_raw" value="/gps_fix" />
+    </node>
+
+</launch>
