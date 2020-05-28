@@ -2,7 +2,9 @@
 
 Based on [geonav_transform](http://wiki.ros.org/geonav_transform) .
 
-When starting gps_nav_node. It will collect 10 GPS singals for setting navsat_transform_node's datum. All the GPS targets will be calulated based on this datum.
+Use navsat_transform_node datum as the origin on map. And transfer the gps target to map target by tf utm -> map.
+
+Make sure gps_nav datum is the same with navsat_transform_node datum.
 
 ## 1. Node
 
@@ -14,11 +16,19 @@ gps_nav
 
 (sensor_msgs/NavSatFix)
 
-Topic name of gps sensor
+gps sensor topic.
 
-### ~has_datum
+### ~topic_goal
 
-(sensor_msgs/Bool, default: false)
+/move_base_simple/goal topic.
+
+### ~param_datum
+
+navsat_transform_node datum parameter
+
+### ~service_datum
+
+navsat_transform_node set_datum service
 
 ## 3. Published Topics
 

@@ -3,8 +3,11 @@
 <launch>
 
     <!-- # gps navigation -->
-    <node pkg="ros_gps_nav" name="gps_nav_node" type="gps_nav_node.py" clear_params="true" output="screen">
-        <param name="topic_gps_raw" value="/gps_fix" />
+    <node pkg="ros_gps_nav" name="gps_nav" type="gps_nav_node.py" clear_params="true" output="screen">
+        <param name="topic_gps" value="/gps_fix" />
+        <param name="topic_move_base_goal" value="/move_base_simple/goal" />
+        <param name="datum_param" value="/navsat/datum" />
+        <param name="datum_service" value="/datum" />
     </node>
 
 </launch>
