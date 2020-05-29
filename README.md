@@ -2,7 +2,7 @@
 
 Based on [geonav_transform](http://wiki.ros.org/geonav_transform) .
 
-Use navsat_transform_node datum as the origin on map. And transfer the gps target to map target by tf utm -> map.
+Use navsat_transform_node datum as the origin of map. And transfer gps target to map by tf utm -> map.
 
 Make sure gps_nav datum is the same with navsat_transform_node datum.
 

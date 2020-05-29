@@ -13,7 +13,7 @@ from ros_gps_nav.srv import GetGPS, GetGPSResponse
 import geonav_transform.geonav_conversions as gc
 import utility
 
-def callback_goal(self, request):
+def callback_goal(request):
     """
     Callback for ~goal service
     """
@@ -32,17 +32,17 @@ def callback_goal(self, request):
 
     return GoalGPSResponse()
 
-def callback_get_gps(self, request):
+def callback_get_gps(request):
     """
     Callback for ~get_gps service
     """
-    latt_avg, long_avg = utility.get_gps(topic=self.topic_gps)
+    latt_avg, long_avg = utility.get_gps(topic=GPS_SENSOR_TOPIC_NAME)
     gps = GetGPSResponse()
     gps.latitude = latt_avg
     gps.longitude = long_avg
     return gps
 
-def callback_reset_datum(self, request):
+def callback_reset_datum(request):
     """
     Callback for ~reset_datum service
     """
@@ -54,23 +54,23 @@ if __name__ == "__main__":
     rospy.init_node(name='gps_nav', anonymous=False)
 
     # -- Get parameter from launch
-    gps_sensor_topic_name = rospy.get_param(param_name="~topic_gps")
+    GPS_SENSOR_TOPIC_NAME = rospy.get_param(param_name="~topic_gps")
     move_base_goal_topic_name = rospy.get_param(param_name="~topic_move_base_goal")
+    navsat_datum_parameter_name = rospy.get_param(param_name="~param_datum")
+    navsat_datum_service_name = rospy.get_param(param_name="~service_datum")
 
     """
     Based on http://docs.ros.org/melodic/api/robot_localization/html/navsat_transform_node.html
     If wait_for_datum is true, navsat_transform_node will wait for ~datum parameter or ~set_datum service.
-    If wait_for_datum is false. it will use the first gps signal as datum.
+    If it is false. it will use the first gps signal to be the datum.
     In my testing. The name of the service is just "~datum", not ~set_datum.
     """
-    navsat_datum_parameter_name = rospy.get_param(param_name="~param_datum")
-    navsat_datum_service_name = rospy.get_param(param_name="~service_datum")
 
     # -- Make sure gps_nav datum is the same with navsat_transform_node datum
     if rospy.has_param(param_name=navsat_datum_parameter_name):
         DATUM = rospy.get_param(param_name=navsat_datum_parameter_name)
     else:
-        latt_avg, long_avg = utility.get_gps(topic=gps_sensor_topic_name)
+        latt_avg, long_avg = utility.get_gps(topic=GPS_SENSOR_TOPIC_NAME)
         DATUM = (latt_avg, long_avg, 0.0)
         utility.set_navsat_datum(datum_service=navsat_datum_service_name, datum=DATUM)
 
