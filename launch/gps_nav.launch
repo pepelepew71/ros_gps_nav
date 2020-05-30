@@ -5,9 +5,9 @@
     <!-- # gps navigation -->
     <node pkg="ros_gps_nav" name="gps_nav" type="gps_nav_node.py" clear_params="true" output="screen">
         <param name="topic_gps" value="/gps_fix" />
-        <param name="topic_move_base_goal" value="/move_base_simple/goal" />
         <param name="param_datum" value="/navsat/datum" />
         <param name="service_datum" value="/datum" />
+        <param name="ns_move_base" value="/move_base" />
     </node>
 
 </launch>

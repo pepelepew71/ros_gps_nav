@@ -1,10 +1,15 @@
 #!/usr/bin/env python
 
+"""
+gps navigation node
+"""
+
 from __future__ import print_function
 from __future__ import division
 
 import rospy
-from geometry_msgs.msg import PoseStamped
+import actionlib
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from std_srvs.srv import Empty, EmptyResponse
 
 from ros_gps_nav.srv import GoalGPS, GoalGPSResponse
@@ -13,26 +18,28 @@ from ros_gps_nav.srv import GetGPS, GetGPSResponse
 import geonav_transform.geonav_conversions as gc
 import utility
 
-def callback_goal(request):
+def cb_goal(request):
     """
-    Callback for ~goal service
+    Callback for ~goal service, using actionlib.SimpleActionClient
     """
     x, y = gc.ll2xy(request.latitude, request.longitude, DATUM[0], DATUM[1])
 
-    goal = PoseStamped()
-    goal.header.frame_id = 'map'
-    goal.header.stamp = rospy.Time.now()
-    goal.pose.position.x = x
-    goal.pose.position.y = y
-    goal.pose.orientation.w = 1
-    publisher.publish(goal)
-
+    goal = MoveBaseGoal()
+    goal.target_pose.header.frame_id = 'map'
+    goal.target_pose.header.stamp = rospy.Time.now()
+    goal.target_pose.pose.position.x = x
+    goal.target_pose.pose.position.y = y
+    goal.target_pose.pose.orientation.w = 1
     rospy.loginfo("GPS target = {} {}".format(request.latitude, request.longitude))
     rospy.loginfo("MAP target = {} {}".format(x, y))
+    state = ACTION_MOVE_BASE.send_goal_and_wait(goal=goal)
 
-    return GoalGPSResponse()
+    response = GoalGPSResponse()
+    response.state = state
 
-def callback_get_gps(request):
+    return response
+
+def cb_get_gps(request):
     """
     Callback for ~get_gps service
     """
@@ -42,7 +49,7 @@ def callback_get_gps(request):
     gps.longitude = long_avg
     return gps
 
-def callback_reset_datum(request):
+def cb_reset_datum(request):
     """
     Callback for ~reset_datum service
     """
@@ -53,20 +60,20 @@ if __name__ == "__main__":
 
     rospy.init_node(name='gps_nav', anonymous=False)
 
-    # -- Get parameter from launch
-    GPS_SENSOR_TOPIC_NAME = rospy.get_param(param_name="~topic_gps")
-    move_base_goal_topic_name = rospy.get_param(param_name="~topic_move_base_goal")
-    navsat_datum_parameter_name = rospy.get_param(param_name="~param_datum")
-    navsat_datum_service_name = rospy.get_param(param_name="~service_datum")
-
+    # -- Get parameters
     """
     Based on http://docs.ros.org/melodic/api/robot_localization/html/navsat_transform_node.html
     If wait_for_datum is true, navsat_transform_node will wait for ~datum parameter or ~set_datum service.
     If it is false. it will use the first gps signal to be the datum.
     In my testing. The name of the service is just "~datum", not ~set_datum.
     """
+    GPS_SENSOR_TOPIC_NAME = rospy.get_param(param_name="~topic_gps", default="/gps_fix")
+    navsat_datum_parameter_name = rospy.get_param(param_name="~param_datum", default="/navsat/datum")
+    navsat_datum_service_name = rospy.get_param(param_name="~service_datum", default="/datum")
+    ns_move_base = rospy.get_param(param_name="~ns_move_base", default="/move_base")
 
-    # -- Make sure gps_nav datum is the same with navsat_transform_node datum
+    # -- Set DATUM, make sure it is the same with navsat_transform_node datum
+    # -- This DATUM means the gps values of the origin of map
     if rospy.has_param(param_name=navsat_datum_parameter_name):
         DATUM = rospy.get_param(param_name=navsat_datum_parameter_name)
     else:
@@ -76,10 +83,13 @@ if __name__ == "__main__":
 
     rospy.loginfo("gps_nav DATUM = {}, {}, {}".format(DATUM[0], DATUM[1], DATUM[2]))
 
+    # -- Action client for move_base
+    ACTION_MOVE_BASE = actionlib.SimpleActionClient(ns=ns_move_base, ActionSpec=MoveBaseAction)
+    ACTION_MOVE_BASE.wait_for_server()
+
     # -- Node function
-    service_goal = rospy.Service(name='~goal', service_class=GoalGPS, handler=callback_goal)
-    service_get_gps = rospy.Service(name='~get_gps', service_class=GetGPS, handler=callback_get_gps)
-    service_datum = rospy.Service(name='~reset_datum', service_class=Empty, handler=callback_reset_datum)
-    publisher = rospy.Publisher(name=move_base_goal_topic_name, data_class=PoseStamped, queue_size=1)
+    service_goal = rospy.Service(name='~goal', service_class=GoalGPS, handler=cb_goal)
+    service_gps = rospy.Service(name='~get_gps', service_class=GetGPS, handler=cb_get_gps)
+    service_datum = rospy.Service(name='~reset_datum', service_class=Empty, handler=cb_reset_datum)
 
     rospy.spin()

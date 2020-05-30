@@ -12,43 +12,35 @@ gps_nav
 
 ## 2. Parameters
 
-### ~topic_gps
+~topic_gps
 
-(sensor_msgs/NavSatFix)
+(sensor_msgs/NavSatFix) gps sensor topic.
 
-gps sensor topic.
-
-### ~topic_goal
-
-/move_base_simple/goal topic.
-
-### ~param_datum
+~param_datum
 
 navsat_transform_node datum parameter
 
-### ~service_datum
+~service_datum
 
 navsat_transform_node set_datum service
 
+~ns_move_base
+
+move_base namespace
+
 ## 3. Published Topics
 
-### move_base_simple/goal
-
-(geometry_msgs/PoseStamped)
+move_base/action_topics
 
 ## 4. Services
 
-### gps_nav/goal
+~goal
 
-(ros_gps_nav.srv/GoalGPS)
+(ros_gps_nav.srv/GoalGPS) Covert GPS target to UTM coordinate and send to /move_base_simple/goal
 
-Covert GPS target to UTM coordinate and send to /move_base_simple/goal
+~get_gps
 
-### gps_nav/get_gps
-
-(std_srvs/Empty)
-
-Get current location's average GPS
+(std_srvs/Empty) Get current location's average GPS
 
 ## 5. Launch
 
