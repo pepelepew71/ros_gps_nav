@@ -8,6 +8,7 @@
         <param name="param_datum" value="/navsat/datum" />
         <param name="service_datum" value="/datum" />
         <param name="ns_move_base" value="/move_base" />
+        <param name="tf_base_link" value="/base_link" />
     </node>
 
 </launch>

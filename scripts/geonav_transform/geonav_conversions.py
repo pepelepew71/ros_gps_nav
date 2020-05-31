@@ -1,5 +1,5 @@
 '''
-Python version of the inline functions defined in the robot_localization, 
+Python version of the inline functions defined in the robot_localization,
 navsat_conversions.h
 '''
 
@@ -30,7 +30,7 @@ UTM_E6   = (UTM_E4*UTM_E2)      # e^6
 UTM_EP2  = (UTM_E2/(1-UTM_E2))  # e'^2
 
 
-def ll2xy(lat,lon,origin_lat,origin_lon):
+def ll2xy(lat, lon, origin_lat, origin_lon):
     '''
     Geonav: Lat/Long to X/Y
     Convert latitude and longitude in dec. degress to x and y in meters
@@ -54,7 +54,7 @@ def ll2xy(lat,lon,origin_lat,origin_lon):
         print('WARNING: geonav_conversion: origin and location are in different UTM zones!')
     y = utmy-outmy
     x = utmx-outmx
-    return (x,y) 
+    return (x,y)
 
 def xy2ll(x, y, orglat, orglon):
     '''
@@ -73,11 +73,11 @@ def xy2ll(x, y, orglat, orglon):
  * Written by Chuck Gantz- chuck.gantz@globalstar.com
  '''
 def UTMLetterDesignator(Lat):
-    
+
     LetterDesignator =""
 
     if ((84 >= Lat) and (Lat >= 72)):  LetterDesignator = 'X'
-    
+
     elif ((72 > Lat) and (Lat >= 64)):  LetterDesignator = 'W';
     elif ((64 > Lat) and (Lat >= 56)):  LetterDesignator = 'V';
     elif ((56 > Lat) and (Lat >= 48)):  LetterDesignator = 'U';
@@ -145,7 +145,7 @@ def LLtoUTM(Lat,Long):
   T = tan(LatRad)*tan(LatRad);
   C = eccPrimeSquared*cos(LatRad)*cos(LatRad);
   A = cos(LatRad)*(LongRad-LongOriginRad);
-  
+
   M = a*((1 - eccSquared/4.0 - 3.0*eccSquared*eccSquared/64.0
           - 5.0*eccSquared*eccSquared*eccSquared/256.0) * LatRad
          - (3.0*eccSquared/8.0 + 3.0*eccSquared*eccSquared/32.0
@@ -166,7 +166,7 @@ def LLtoUTM(Lat,Long):
   if (Lat < 0):
       # 10000000 meter offset for southern hemisphere
       UTMNorthing += 10000000.0;
-  
+
   return (UTMNorthing, UTMEasting, UTMZone)
 
 '''*
@@ -187,7 +187,7 @@ def UTMtoLL(UTMNorthing,UTMEasting,UTMZone):
 
   x = UTMEasting - 500000.0;  # remove 500,000 meter offset for longitude
   y = UTMNorthing;
-  
+
   ZoneLetter = re.findall('([a-zA-Z])',UTMZone)[0]
   ZoneNumber = float( UTMZone.split(ZoneLetter)[0] )
 
@@ -204,7 +204,7 @@ def UTMtoLL(UTMNorthing,UTMEasting,UTMZone):
   phi1Rad = mu + ((3.0*e1/2.0-27.0*e1*e1*e1/32.0)*sin(2.0*mu)
                   + (21.0*e1*e1/16.0-55.0*e1*e1*e1*e1/32.0)*sin(4.0*mu)
                   + (151.0*e1*e1*e1/96.0)*sin(6.0*mu));
-  
+
   N1 = a/sqrt(1.0-eccSquared*sin(phi1Rad)*sin(phi1Rad));
   T1 = tan(phi1Rad)*tan(phi1Rad);
   C1 = eccPrimeSquared*cos(phi1Rad)*cos(phi1Rad);
@@ -216,9 +216,9 @@ def UTMtoLL(UTMNorthing,UTMEasting,UTMZone):
                        -9.0*eccPrimeSquared)*D*D*D*D/24.0
                      +(61.0+90.0*T1+298.0*C1+45.0*T1*T1-252.0*eccPrimeSquared
                        -3.0*C1*C1)*D*D*D*D*D*D/720.0));
-  
+
   Lat = Lat * DEGREES_PER_RADIAN;
-  
+
   Long = ((D-(1.0+2.0*T1+C1)*D*D*D/6.0
            +(5.0-2.0*C1+28.0*T1-3.0*C1*C1+8.0*eccPrimeSquared+24.0*T1*T1)
            *D*D*D*D*D/120.0)

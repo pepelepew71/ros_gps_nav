@@ -11,6 +11,7 @@ import rospy
 import actionlib
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from std_srvs.srv import Empty, EmptyResponse
+from tf import TransformListener
 
 from ros_gps_nav.srv import GoalGPS, GoalGPSResponse
 from ros_gps_nav.srv import GetGPS, GetGPSResponse
@@ -54,6 +55,11 @@ def cb_reset_datum(request):
     Callback for ~reset_datum service
     """
     # TODO: reset gps_nav datum when robot is not located at the origin.
+    global DATUM
+    latt_avg, long_avg = utility.get_gps(topic=GPS_SENSOR_TOPIC_NAME)
+    rospy.loginfo("Current GPS = {} {}".format(latt_avg, long_avg))
+    DATUM = (latt_avg, long_avg, 0.0)
+    utility.set_navsat_datum(datum_service=NAVSAT_DATUM_SERVICE_NAME, datum=DATUM)
     return EmptyResponse()
 
 if __name__ == "__main__":
@@ -69,23 +75,27 @@ if __name__ == "__main__":
     """
     GPS_SENSOR_TOPIC_NAME = rospy.get_param(param_name="~topic_gps", default="/gps_fix")
     navsat_datum_parameter_name = rospy.get_param(param_name="~param_datum", default="/navsat/datum")
-    navsat_datum_service_name = rospy.get_param(param_name="~service_datum", default="/datum")
+    NAVSAT_DATUM_SERVICE_NAME = rospy.get_param(param_name="~service_datum", default="/datum")
     ns_move_base = rospy.get_param(param_name="~ns_move_base", default="/move_base")
+    TF_BASE_LINK = rospy.get_param(param_name="~tf_base_link", default="/base_link")
 
     # -- Set DATUM, make sure it is the same with navsat_transform_node datum
     # -- This DATUM means the gps values of the origin of map
+    DATUM = list()
+
     if rospy.has_param(param_name=navsat_datum_parameter_name):
         DATUM = rospy.get_param(param_name=navsat_datum_parameter_name)
     else:
         latt_avg, long_avg = utility.get_gps(topic=GPS_SENSOR_TOPIC_NAME)
         DATUM = (latt_avg, long_avg, 0.0)
-        utility.set_navsat_datum(datum_service=navsat_datum_service_name, datum=DATUM)
+        utility.set_navsat_datum(datum_service=NAVSAT_DATUM_SERVICE_NAME, datum=DATUM)
 
     rospy.loginfo("gps_nav DATUM = {}, {}, {}".format(DATUM[0], DATUM[1], DATUM[2]))
 
     # -- Action client for move_base
     ACTION_MOVE_BASE = actionlib.SimpleActionClient(ns=ns_move_base, ActionSpec=MoveBaseAction)
     ACTION_MOVE_BASE.wait_for_server()
+    TF_LISTENER = tf.TransformListener()
 
     # -- Node function
     service_goal = rospy.Service(name='~goal', service_class=GoalGPS, handler=cb_goal)
