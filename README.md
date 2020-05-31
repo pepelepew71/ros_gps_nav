@@ -16,10 +16,6 @@ gps_nav
 
 (sensor_msgs/NavSatFix) gps sensor topic.
 
-~param_datum
-
-navsat_transform_node datum parameter
-
 ~service_datum
 
 navsat_transform_node set_datum service
@@ -38,9 +34,9 @@ move_base/action_topics
 
 (ros_gps_nav.srv/GoalGPS) Covert GPS target to UTM coordinate and send to /move_base_simple/goal
 
-~get_gps
+~set_datum
 
-(std_srvs/Empty) Get current location's average GPS
+(std_srvs/Empty) Set current location's GPS signal as the navsat_transform_node datum. It will be the origin of map when using ekf node.
 
 ## 5. Launch
 

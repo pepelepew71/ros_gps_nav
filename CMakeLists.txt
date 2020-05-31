@@ -57,7 +57,6 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   GoalGPS.srv
-  GetGPS.srv
 )
 
 ## Generate actions in the 'action' folder
