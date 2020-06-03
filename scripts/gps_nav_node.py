@@ -14,7 +14,6 @@ from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from std_srvs.srv import Empty, EmptyResponse
 
 from ros_gps_nav.srv import GoalGPS, GoalGPSResponse
-from ros_gps_nav.srv import GetGPS, GetGPSResponse
 
 import geonav_transform.geonav_conversions as gc
 import utility
@@ -47,7 +46,7 @@ def cb_set_datum(request):
     This Datum should be the origin of map.
     """
     global DATUM
-    latt_avg, long_avg = utility.get_gps(topic=GPS_SENSOR_TOPIC_NAME)
+    latt_avg, long_avg = utility.get_avg_gps(topic=GPS_SENSOR_TOPIC_NAME)
     DATUM = (latt_avg, long_avg, 0.0)
     utility.set_navsat_datum(datum_service=NAVSAT_DATUM_SERVICE_NAME, datum=DATUM)
     rospy.loginfo("gps_nav DATUM = {}, {}, {}".format(DATUM[0], DATUM[1], DATUM[2]))

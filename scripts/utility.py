@@ -14,7 +14,7 @@ from robot_localization.srv import SetDatum
 LATTS = list()
 LONGS = list()
 
-def get_gps(topic, count=10):
+def get_avg_gps(topic, count=10):
     """
     Get average gps signal (deault to 10)
     """
