@@ -18,8 +18,8 @@ import utility
 
 def cb_record(request):
     global RECORDS
-    latt_avg, long_avg = utility.get_avg_gps(topic=GPS_SENSOR_TOPIC_NAME, count=1)
-    RECORDS.append((latt_avg, long_avg))
+    lati_avg, long_avg = utility.get_avg_gps(topic=GPS_SENSOR_TOPIC_NAME, count=1)
+    RECORDS.append((lati_avg, long_avg))
     return EmptyResponse()
 
 def cb_save(request):
