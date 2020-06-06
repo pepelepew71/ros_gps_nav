@@ -2,7 +2,7 @@
 
 Based on [geonav_transform](http://wiki.ros.org/geonav_transform) .
 
-Use navsat_transform_node datum as the origin of map. And transfer gps target to map by tf utm -> map.
+Use navsat_transform_node datum as the origin of map. Then transfer gps target to map by tf utm -> map.
 
 Make sure gps_nav datum is the same with navsat_transform_node datum.
 
@@ -37,9 +37,3 @@ move_base/action_topics
 ~set_datum
 
 (std_srvs/Empty) Set current location's GPS signal as the navsat_transform_node datum. It will be the origin of map when using ekf node.
-
-## 5. Launch
-
-```bash
-roslaunch gps_navigation gps_nav.launch
-```
