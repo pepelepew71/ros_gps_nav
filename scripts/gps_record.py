@@ -49,17 +49,12 @@ def cb_delete(request):
 
 if __name__ == "__main__":
 
-    rospy.init_node(name='gps_recorder', anonymous=False)
+    rospy.init_node(name='gps_record', anonymous=False)
     RECORDS = list()
 
     # -- Get parameters
     GPS_SENSOR_TOPIC_NAME = rospy.get_param(param_name="~topic_gps", default="/gps_fix")
-    path_folder = rospy.get_param(param_name="~path_folder")
-
-    # -- Create path of file
-    if not os.path.exists(path=path_folder):
-        os.mkdir(path_folder)
-    PATH_FILE = path_folder + "/records.txt"
+    PATH_FILE = rospy.get_param(param_name="~path_file")
 
     # -- Node function
     rospy.Service(name='~record', service_class=Empty, handler=cb_record)

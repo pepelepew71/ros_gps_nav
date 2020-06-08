@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<launch>
+
+    <!-- # gps recorder -->
+    <node pkg="ros_gps_nav" type="gps_record.py" name="gps_record" output="screen">
+        <param name="topic_gps" value="/gps_fix" />
+        <param name="path_file" value="$(find ros_gps_nav)/files/gps.txt" />
+    </node>
+
+</launch>

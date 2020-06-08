@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- # Using teleop to move robot and record gps waypoint -->
+
+<launch>
+
+    <!-- # gazebo -->
+    <include file="$(find my_robot_sim)/launch/gazebo.launch">
+        <arg name="tf_odom_enabled" value="false" />
+    </include>
+
+    <!-- # ros_teleop -->
+    <include file="$(find ros_teleop)/launch/joy.launch" />
+
+    <!-- # gps record -->
+    <include file="$(find ros_gps_nav)/launch/gps_record.launch" />
+
+</launch>
