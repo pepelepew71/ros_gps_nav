@@ -13,7 +13,7 @@ base_link
 <launch>
 
     <!-- # gazebo -->
-    <include file="$(find my_robot_sim)/launch/gazebo.launch">
+    <include file="$(find my_robot)/launch/gazebo.launch">
         <arg name="tf_odom_enabled" value="false" />
     </include>
 
