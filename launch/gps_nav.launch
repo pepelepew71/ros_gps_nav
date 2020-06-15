@@ -6,12 +6,14 @@
     <arg name="topic_gps" default="/gps_fix" />
     <arg name="service_datum" default="/datum" />
     <arg name="ns_move_base" default="/move_base" />
+    <arg name="param_nav_setup" default="/nav_setup" />
 
     <!-- # gps navigation -->
     <node pkg="ros_gps_nav" name="gps_nav" type="gps_nav.py" clear_params="true" output="screen">
         <param name="topic_gps" value="$(arg topic_gps)" />
         <param name="service_datum" value="$(arg service_datum)" />
         <param name="ns_move_base" value="$(arg ns_move_base)" />
+        <param name="param_nav_setup" value="$(arg param_nav_setup)" />
     </node>
 
 </launch>

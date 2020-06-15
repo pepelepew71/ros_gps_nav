@@ -17,43 +17,42 @@ from std_srvs.srv import Empty, EmptyResponse
 import utility
 
 def cb_record(request):
-    global RECORDS
     lati_avg, long_avg = utility.get_avg_gps(topic=GPS_SENSOR_TOPIC_NAME, count=10)
-    RECORDS.append((lati_avg, long_avg))
+    value = "{0},{1},{2}\n".format(lati_avg, long_avg, 1)
+    rospy.set_param(param_name=PARAM_NAME_NAV_SETUP, param_value=value)
     return EmptyResponse()
 
 def cb_save(request):
+    csv_txt = rospy.get_param(param_name=PARAM_NAME_NAV_SETUP)
     with open(name=PATH_FILE, mode="w") as fileio:
-        for i in RECORDS:
-            fileio.write("{} {}\n".format(i[0], i[1]))
+        fileio.write(csv_txt)
     return EmptyResponse()
 
 def cb_load(request):
-    global RECORDS
-    RECORDS = list()
-    with open(name=PATH_FILE, mode="r") as fileio:
-        data = fileio.readlines()
-    for line in data:
-        RECORDS.append(line.split(sep=" "))
+
+    if os.path.exists(path=PATH_FILE):
+        with open(name=PATH_FILE, mode="r") as fileio:
+            csv_txt = fileio.read()
+    else:
+        csv_txt = ""
+        rospy.loginfo("/gps_record: nav_setup.csv is not exist")
+
+    rospy.set_param(param_name=PARAM_NAME_NAV_SETUP, param_value=csv_txt)
+
     return EmptyResponse()
 
 def cb_clear(request):
-    global RECORDS
-    RECORDS = list()
-    return EmptyResponse()
-
-def cb_delete(request):
-    if os.path.exists(PATH_FILE):
-        os.remove(PATH_FILE)
+    csv_txt = ""
+    rospy.set_param(param_name=PARAM_NAME_NAV_SETUP, param_value=csv_txt)
     return EmptyResponse()
 
 if __name__ == "__main__":
 
     rospy.init_node(name='gps_record', anonymous=False)
-    RECORDS = list()
 
     # -- Get parameters
     GPS_SENSOR_TOPIC_NAME = rospy.get_param(param_name="~topic_gps", default="/gps_fix")
+    PARAM_NAME_NAV_SETUP = rospy.get_param(param_name="~param_nav_setup", default="/nav_setup")
     PATH_FILE = rospy.get_param(param_name="~path_file")
 
     # -- Node function
@@ -61,6 +60,8 @@ if __name__ == "__main__":
     rospy.Service(name='~save', service_class=Empty, handler=cb_save)
     rospy.Service(name='~load', service_class=Empty, handler=cb_load)
     rospy.Service(name='~clear', service_class=Empty, handler=cb_clear)
-    rospy.Service(name='~delete', service_class=Empty, handler=cb_delete)
+
+    # -- Load nav_setup.csv
+    cb_load("")
 
     rospy.spin()

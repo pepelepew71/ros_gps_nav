@@ -4,12 +4,14 @@
 
     <!-- # args -->
     <arg name="topic_gps" default="/gps_fix" />
-    <arg name="path_file" default="$(find ros_gps_nav)/files/gps.txt" />
+    <arg name="path_file" default="$(find ros_gps_nav)/files/nav_setup.csv" />
+    <arg name="param_nav_setup" default="/nav_setup" />
 
     <!-- # gps recorder -->
     <node pkg="ros_gps_nav" type="gps_record.py" name="gps_record" output="screen">
         <param name="topic_gps" value="$(arg topic_gps)" />
         <param name="path_file" value="$(arg path_file)" />
+        <param name="param_nav_setup" value="$(arg param_nav_setup)" />
     </node>
 
 </launch>

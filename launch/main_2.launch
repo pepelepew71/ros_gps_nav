@@ -18,14 +18,14 @@ base_link
     </include>
 
     <!-- # move_base -->
-    <include file="$(find my_move_base)/launch/move_base.launch">
+    <include file="$(find ros_my_move_base)/launch/move_base.launch">
         <arg name="use_map" value="false" />
     </include>
 
     <!-- # robot localization -->
-    <include file="$(find my_localization)/launch/ekf_odom.launch" />
-    <include file="$(find my_localization)/launch/ekf_gps.launch" />
-    <include file="$(find my_localization)/launch/navsat.launch">
+    <include file="$(find ros_my_localization)/launch/ekf_odom.launch" />
+    <include file="$(find ros_my_localization)/launch/ekf_gps.launch" />
+    <include file="$(find ros_my_localization)/launch/navsat.launch">
         <arg name="has_datum" value="false" />
     </include>
 
