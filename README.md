@@ -6,11 +6,11 @@ Use navsat_transform_node datum as the origin of map. Then transfer gps target t
 
 Make sure gps_nav datum is the same with navsat_transform_node datum.
 
-## 1. Node
+## Node
 
-gps_nav
+### 1. gps_nav
 
-## 2. Parameters
+#### 1.1. Parameters
 
 ~topic_gps
 
@@ -24,11 +24,11 @@ navsat_transform_node set_datum service
 
 move_base namespace
 
-## 3. Published Topics
+#### 1.2. Published Topics
 
 move_base/action_topics
 
-## 4. Services
+#### 1.3. Services
 
 ~goal
 
@@ -37,3 +37,29 @@ move_base/action_topics
 ~set_datum
 
 (std_srvs/Empty) Set current location's GPS signal as the navsat_transform_node datum. It will be the origin of map when using ekf node.
+
+---
+
+### 2. gps_rec
+
+#### 2.1. Parameters
+
+~topic_gps
+
+~param_nav_setup
+
+~path_file
+
+#### 2.2. Services
+
+~record
+
+~save
+
+~load
+
+~clear
+
+~get
+
+~set

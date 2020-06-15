@@ -57,6 +57,8 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   GoalGPS.srv
+  GetNav.srv
+  SetNav.srv
 )
 
 ## Generate actions in the 'action' folder

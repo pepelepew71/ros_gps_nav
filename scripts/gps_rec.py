@@ -14,41 +14,55 @@ import rospy
 from sensor_msgs.msg import NavSatFix
 from std_srvs.srv import Empty, EmptyResponse
 
+from ros_gps_nav.srv import GetNav, GetNavResponse
+from ros_gps_nav.srv import SetNav, SetNavResponse
+
 import utility
 
 def cb_record(request):
     lati_avg, long_avg = utility.get_avg_gps(topic=GPS_SENSOR_TOPIC_NAME, count=10)
-    value = "{0},{1},{2}\n".format(lati_avg, long_avg, 1)
-    rospy.set_param(param_name=PARAM_NAME_NAV_SETUP, param_value=value)
+    csvtxt = rospy.get_param(param_name=PARAM_NAME_NAV_SETUP)
+    csvtxt += "{0},{1},{2}\n".format(lati_avg, long_avg, 1)  # default to num 1
+    rospy.set_param(param_name=PARAM_NAME_NAV_SETUP, param_value=csvtxt)
     return EmptyResponse()
 
 def cb_save(request):
-    csv_txt = rospy.get_param(param_name=PARAM_NAME_NAV_SETUP)
+    csvtxt = rospy.get_param(param_name=PARAM_NAME_NAV_SETUP)
     with open(name=PATH_FILE, mode="w") as fileio:
-        fileio.write(csv_txt)
+        fileio.write(csvtxt)
     return EmptyResponse()
 
 def cb_load(request):
 
     if os.path.exists(path=PATH_FILE):
         with open(name=PATH_FILE, mode="r") as fileio:
-            csv_txt = fileio.read()
+            csvtxt = fileio.read()
     else:
-        csv_txt = ""
-        rospy.loginfo("/gps_record: nav_setup.csv is not exist")
+        csvtxt = ""
+        rospy.loginfo("/gps_rec: nav_setup.csv is not exist")
 
-    rospy.set_param(param_name=PARAM_NAME_NAV_SETUP, param_value=csv_txt)
+    rospy.set_param(param_name=PARAM_NAME_NAV_SETUP, param_value=csvtxt)
 
     return EmptyResponse()
 
 def cb_clear(request):
-    csv_txt = ""
-    rospy.set_param(param_name=PARAM_NAME_NAV_SETUP, param_value=csv_txt)
+    csvtxt = ""
+    rospy.set_param(param_name=PARAM_NAME_NAV_SETUP, param_value=csvtxt)
     return EmptyResponse()
+
+def cb_get(request):
+    csvtxt = rospy.get_param(param_name=PARAM_NAME_NAV_SETUP)
+    response = GetNavResponse()
+    response.csvtxt = csvtxt
+    return response
+
+def cb_set(request):
+    rospy.set_param(param_name=PARAM_NAME_NAV_SETUP, param_value=request.csvtxt)
+    return SetNavResponse()
 
 if __name__ == "__main__":
 
-    rospy.init_node(name='gps_record', anonymous=False)
+    rospy.init_node(name='gps_rec', anonymous=False)
 
     # -- Get parameters
     GPS_SENSOR_TOPIC_NAME = rospy.get_param(param_name="~topic_gps", default="/gps_fix")
@@ -60,6 +74,8 @@ if __name__ == "__main__":
     rospy.Service(name='~save', service_class=Empty, handler=cb_save)
     rospy.Service(name='~load', service_class=Empty, handler=cb_load)
     rospy.Service(name='~clear', service_class=Empty, handler=cb_clear)
+    rospy.Service(name="~get", service_class=GetNav, handler=cb_get)
+    rospy.Service(name="~set", service_class=SetNav, handler=cb_set)
 
     # -- Load nav_setup.csv
     cb_load("")

@@ -13,6 +13,6 @@
     <include file="$(find ros_teleop)/launch/joy.launch" />
 
     <!-- # gps record -->
-    <include file="$(find ros_gps_nav)/launch/gps_record.launch" />
+    <include file="$(find ros_gps_nav)/launch/gps_rec.launch" />
 
 </launch>
