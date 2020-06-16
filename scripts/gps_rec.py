@@ -9,9 +9,11 @@ from __future__ import print_function
 from __future__ import division
 
 import os
+import time
 
 import rospy
 from sensor_msgs.msg import NavSatFix
+from std_msgs.msg import String
 from std_srvs.srv import Empty, EmptyResponse
 
 from ros_gps_nav.srv import GetNav, GetNavResponse
@@ -20,33 +22,39 @@ from ros_gps_nav.srv import SetNav, SetNavResponse
 import utility
 
 def cb_record(request):
+
+    if IS_PUB_STATUS:
+        PUB_STATUS.publish("Recording")
+
     lati_avg, long_avg = utility.get_avg_gps(topic=GPS_SENSOR_TOPIC_NAME, count=10)
     csvtxt = rospy.get_param(param_name=PARAM_NAME_NAV_SETUP)
-    csvtxt += "{0},{1},{2}\n".format(lati_avg, long_avg, 1)  # default to num 1
+    if csvtxt:
+        csvtxt += "\n{0},{1},{2}".format(lati_avg, long_avg, 1)  # default to num 1
+    else:
+        csvtxt += "{0},{1},{2}".format(lati_avg, long_avg, 1)
     rospy.set_param(param_name=PARAM_NAME_NAV_SETUP, param_value=csvtxt)
+
+    if IS_PUB_STATUS:
+        PUB_STATUS.publish("Done")
+        time.sleep(2)
+        PUB_STATUS.publish("")
+
     return EmptyResponse()
 
 def cb_save(request):
+    rospy.loginfo("/gps_rec: saving nav_setup.csv")
     csvtxt = rospy.get_param(param_name=PARAM_NAME_NAV_SETUP)
     with open(name=PATH_FILE, mode="w") as fileio:
         fileio.write(csvtxt)
     return EmptyResponse()
 
-def cb_load(request):
-
+def cb_read(request):
+    csvtxt = ""
     if os.path.exists(path=PATH_FILE):
         with open(name=PATH_FILE, mode="r") as fileio:
             csvtxt = fileio.read()
     else:
-        csvtxt = ""
         rospy.loginfo("/gps_rec: nav_setup.csv is not exist")
-
-    rospy.set_param(param_name=PARAM_NAME_NAV_SETUP, param_value=csvtxt)
-
-    return EmptyResponse()
-
-def cb_clear(request):
-    csvtxt = ""
     rospy.set_param(param_name=PARAM_NAME_NAV_SETUP, param_value=csvtxt)
     return EmptyResponse()
 
@@ -68,16 +76,19 @@ if __name__ == "__main__":
     GPS_SENSOR_TOPIC_NAME = rospy.get_param(param_name="~topic_gps", default="/gps_fix")
     PARAM_NAME_NAV_SETUP = rospy.get_param(param_name="~param_nav_setup", default="/nav_setup")
     PATH_FILE = rospy.get_param(param_name="~path_file")
+    IS_PUB_STATUS = rospy.get_param(param_name="~is_pub_status")
 
     # -- Node function
+    if IS_PUB_STATUS:
+        PUB_STATUS = rospy.Publisher(name="/status_for_web", data_class=String, queue_size=1)
+
     rospy.Service(name='~record', service_class=Empty, handler=cb_record)
     rospy.Service(name='~save', service_class=Empty, handler=cb_save)
-    rospy.Service(name='~load', service_class=Empty, handler=cb_load)
-    rospy.Service(name='~clear', service_class=Empty, handler=cb_clear)
+    rospy.Service(name='~read', service_class=Empty, handler=cb_read)
     rospy.Service(name="~get", service_class=GetNav, handler=cb_get)
     rospy.Service(name="~set", service_class=SetNav, handler=cb_set)
 
     # -- Load nav_setup.csv
-    cb_load("")
+    cb_read("")
 
     rospy.spin()

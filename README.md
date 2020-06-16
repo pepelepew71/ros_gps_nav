@@ -56,9 +56,7 @@ move_base/action_topics
 
 ~save
 
-~load
-
-~clear
+~read
 
 ~get
 
