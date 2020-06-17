@@ -26,17 +26,14 @@ def cb_record(request):
     if IS_PUB_STATUS:
         PUB_STATUS.publish("Recording")
 
-    lati_avg, long_avg = utility.get_avg_gps(topic=GPS_SENSOR_TOPIC_NAME, count=10)
     csvtxt = rospy.get_param(param_name=PARAM_NAME_NAV_SETUP)
-    if csvtxt:
-        csvtxt += "\n{0},{1},{2}".format(lati_avg, long_avg, 1)  # default to num 1
-    else:
-        csvtxt += "{0},{1},{2}".format(lati_avg, long_avg, 1)
+    lati_avg, long_avg = utility.get_avg_gps(topic=GPS_SENSOR_TOPIC_NAME, count=10)
+    csvtxt += "{0},{1},{2}\n".format(lati_avg, long_avg, 1)  # default to num 1
     rospy.set_param(param_name=PARAM_NAME_NAV_SETUP, param_value=csvtxt)
 
     if IS_PUB_STATUS:
         PUB_STATUS.publish("Done")
-        time.sleep(2)
+        time.sleep(1)
         PUB_STATUS.publish("")
 
     return EmptyResponse()
@@ -52,7 +49,11 @@ def cb_read(request):
     csvtxt = ""
     if os.path.exists(path=PATH_FILE):
         with open(name=PATH_FILE, mode="r") as fileio:
-            csvtxt = fileio.read()
+            lines = fileio.readlines()
+        for line in lines:
+            txt = line.rstrip()  # remove newline
+            if txt:
+                csvtxt += txt + "\n"
     else:
         rospy.loginfo("/gps_rec: nav_setup.csv is not exist")
     rospy.set_param(param_name=PARAM_NAME_NAV_SETUP, param_value=csvtxt)
