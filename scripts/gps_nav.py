@@ -64,7 +64,7 @@ if __name__ == "__main__":
     In my testing. The name of the service is just "~datum", not ~set_datum.
     """
     GPS_SENSOR_TOPIC_NAME = rospy.get_param(param_name="~topic_gps", default="/gps_fix")
-    NAVSAT_DATUM_SERVICE_NAME = rospy.get_param(param_name="~service_datum", default="/datum")
+    NAVSAT_DATUM_SERVICE_NAME = rospy.get_param(param_name="~service_datum", default="/datum")  # navsat service name for setup datum
     ns_move_base = rospy.get_param(param_name="~ns_move_base", default="/move_base")
 
     # -- Set DATUM, make sure it is the same with navsat_transform_node datum

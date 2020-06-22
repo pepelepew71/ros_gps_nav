@@ -4,6 +4,7 @@
 
     <!-- # args -->
     <arg name="topic_gps" default="/gps_fix" />
+    <!-- ## the service from navsat is default to /datum !! -->
     <arg name="service_datum" default="/datum" />
     <arg name="ns_move_base" default="/move_base" />
     <arg name="param_nav_setup" default="/nav_setup" />
