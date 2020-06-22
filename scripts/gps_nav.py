@@ -22,7 +22,7 @@ def cb_goal(request):
     """
     Callback for ~goal service, using actionlib.SimpleActionClient
     """
-    x, y = gc.ll2xy(request.latitude, request.longitude, DATUM[0], DATUM[1])
+    x, y = gc.ll2xy_nzy(request.latitude, request.longitude, DATUM[0], DATUM[1])
 
     goal = MoveBaseGoal()
     goal.target_pose.header.frame_id = 'map'

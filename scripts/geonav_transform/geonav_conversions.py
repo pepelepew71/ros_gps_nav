@@ -56,6 +56,14 @@ def ll2xy(lat, lon, origin_lat, origin_lon):
     x = utmx-outmx
     return (x,y)
 
+def ll2xy_nzy(lat, lon, origin_lat, origin_lon):
+    """
+    ll2xy north zero yaw version
+    """
+    x, y = ll2xy(lat, lon, origin_lat, origin_lon)
+    x, y = y, -x
+    return (x, y)
+
 def xy2ll(x, y, orglat, orglon):
     '''
     '''
