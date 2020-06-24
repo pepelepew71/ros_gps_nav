@@ -22,6 +22,10 @@ def cb_goal(request):
     """
     Callback for ~goal service, using actionlib.SimpleActionClient
     """
+    # -- east zero yaw
+    # x, y = gc.ll2xy(request.latitude, request.longitude, DATUM[0], DATUM[1])
+
+    # --north zero yaw
     x, y = gc.ll2xy_nzy(request.latitude, request.longitude, DATUM[0], DATUM[1])
 
     goal = MoveBaseGoal()
@@ -46,9 +50,11 @@ def cb_set_datum(request):
     This Datum should be the origin of map.
     """
     global DATUM
-    lati_avg, long_avg = utility.get_avg_gps(topic=GPS_SENSOR_TOPIC_NAME)
+    lati_avg, long_avg = utility.get_avg_gps(topic=NAME_TOPIC_GPS)
     DATUM = (lati_avg, long_avg, 0.0)
-    utility.set_navsat_datum(datum_service=NAVSAT_DATUM_SERVICE_NAME, datum=DATUM)
+
+    utility.set_navsat_datum(datum_service=NAME_SERVICE_NAVSAT_DATUM, datum=DATUM)
+
     rospy.loginfo("gps_nav DATUM = {}, {}, {}".format(DATUM[0], DATUM[1], DATUM[2]))
     return EmptyResponse()
 
@@ -63,17 +69,18 @@ if __name__ == "__main__":
     If it is false. it will use the first gps signal to be the datum.
     In my testing. The name of the service is just "~datum", not ~set_datum.
     """
-    GPS_SENSOR_TOPIC_NAME = rospy.get_param(param_name="~topic_gps", default="/gps_fix")
-    NAVSAT_DATUM_SERVICE_NAME = rospy.get_param(param_name="~service_datum", default="/datum")  # navsat service name for setup datum
-    ns_move_base = rospy.get_param(param_name="~ns_move_base", default="/move_base")
+    NAME_TOPIC_GPS = rospy.get_param(param_name="~topic_gps", default="/gps_fix")
+    NAME_SERVICE_NAVSAT_DATUM = rospy.get_param(param_name="~service_datum", default="/datum")  # navsat service name for setup datum
+    name_ns_move_base = rospy.get_param(param_name="~ns_move_base", default="/move_base")
 
     # -- Set DATUM, make sure it is the same with navsat_transform_node datum
     # -- This DATUM means the gps values of the origin of map
     DATUM = list()
-    cb_set_datum("")
+    cb_set_datum("")  # TODO, <<< important! this will stop the launch calling /fsm/start.
+                      # This is what I want but I don't know why.
 
-    # -- Action client for move_base
-    ACTION_MOVE_BASE = actionlib.SimpleActionClient(ns=ns_move_base, ActionSpec=MoveBaseAction)
+    # -- Get ServiceProxy, Action client
+    ACTION_MOVE_BASE = actionlib.SimpleActionClient(ns=name_ns_move_base, ActionSpec=MoveBaseAction)
     ACTION_MOVE_BASE.wait_for_server()
 
     # -- Node function
