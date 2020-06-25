@@ -18,7 +18,6 @@ from std_srvs.srv import Empty, EmptyResponse
 
 from ros_gps_nav.srv import GetNav, GetNavResponse
 from ros_gps_nav.srv import SetNav, SetNavResponse
-
 import utility
 
 def cb_record(request):

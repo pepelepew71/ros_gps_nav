@@ -9,8 +9,6 @@ import rospy
 from sensor_msgs.msg import NavSatFix
 from geographic_msgs.msg import GeoPose
 
-from robot_localization.srv import SetDatum
-
 LATIS = list()
 LONGS = list()
 
@@ -42,20 +40,3 @@ def _callback(msg_navsatfix):
     rospy.loginfo("GPS = {} {}".format(msg_navsatfix.latitude, msg_navsatfix.longitude))
     LATIS.append(msg_navsatfix.latitude)
     LONGS.append(msg_navsatfix.longitude)
-
-def set_navsat_datum(datum_service, datum):
-    """
-    Use robot_localization navsat_transform_node service to set datum.
-    Note: Changing existing parameter ~datum will not effect navsat_transform_node
-    """
-    rospy.wait_for_service(service=datum_service)
-    service = rospy.ServiceProxy(name=datum_service, service_class=SetDatum)
-    geo_pose = GeoPose()
-    geo_pose.position.latitude = datum[0]
-    geo_pose.position.longitude = datum[1]
-    geo_pose.position.altitude = datum[2]
-    geo_pose.orientation.x = 0.0
-    geo_pose.orientation.y = 0.0
-    geo_pose.orientation.z = 0.0
-    geo_pose.orientation.w = 1.0
-    service(geo_pose)  # navsat_transform_node datum
