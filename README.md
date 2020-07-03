@@ -12,17 +12,13 @@ Make sure gps_nav datum is the same with navsat_transform_node datum.
 
 #### 1.1. Parameters
 
-~topic_gps
+```~top_gps``` (sensor_msgs/NavSatFix): gps sensor topic.
 
-(sensor_msgs/NavSatFix) gps sensor topic.
+```~srv_init_state``` :
 
-~service_datum
+```~srv_datum``` : navsat_transform_node set_datum service
 
-navsat_transform_node set_datum service
-
-~ns_move_base
-
-move_base namespace
+```~ns_move_base``` : move_base namespace
 
 #### 1.2. Published Topics
 
@@ -30,13 +26,9 @@ move_base/action_topics
 
 #### 1.3. Services
 
-~goal
+```~goal``` (ros_gps_nav.srv/GoalGPS) : Covert GPS target to UTM coordinate and send to /move_base_simple/goal
 
-(ros_gps_nav.srv/GoalGPS) Covert GPS target to UTM coordinate and send to /move_base_simple/goal
-
-~set_datum
-
-(std_srvs/Empty) Set current location's GPS signal as the navsat_transform_node datum. It will be the origin of map when using ekf node.
+```~set_datum``` (std_srvs/Empty) : Set current location's GPS signal as the navsat_transform_node datum. It will be the origin of map when using ekf node.
 
 ---
 
@@ -44,20 +36,20 @@ move_base/action_topics
 
 #### 2.1. Parameters
 
-~topic_gps
+```~topic_gps```
 
-~param_nav_setup
+```~param_nav_setup```
 
-~path_file
+```~path_file```
 
 #### 2.2. Services
 
-~record
+```~record```
 
-~save
+```~save```
 
-~read
+```~read```
 
-~get
+```~get```
 
-~set
+```~set```

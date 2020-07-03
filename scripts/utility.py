@@ -12,15 +12,18 @@ from geographic_msgs.msg import GeoPose
 LATIS = list()
 LONGS = list()
 
-def get_avg_gps(topic, count=10):
+def get_avg_gps(topic, num=10):
     """
     Get average gps signal (deault to 10)
     """
     global LATIS, LONGS
+    LATIS = list()
+    LONGS = list()
+
     subscriber = rospy.Subscriber(name=topic, data_class=NavSatFix, callback=_callback)
 
     rate = rospy.Rate(hz=1)
-    while len(LATIS) < count+1:
+    while len(LATIS) < num+1:
         rate.sleep()
     subscriber.unregister()
 
@@ -29,7 +32,7 @@ def get_avg_gps(topic, count=10):
     LATIS = list()
     LONGS = list()
 
-    rospy.loginfo("GPS {} signal average = {} {}".format(count, latt_avg, long_avg))
+    rospy.loginfo("GPS {} signal average = {} {}".format(num, latt_avg, long_avg))
     return (latt_avg, long_avg)
 
 def _callback(msg_navsatfix):

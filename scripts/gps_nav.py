@@ -65,7 +65,7 @@ def cb_set_datum(request):
     geo_pose = GeoPose()
     geo_pose.position.latitude = DATUM[0]
     geo_pose.position.longitude = DATUM[1]
-    geo_pose.position.altitude = DATUM[2]
+    geo_pose.position.altitude = 0.0
     geo_pose.orientation.x = 0.0
     geo_pose.orientation.y = 0.0
     geo_pose.orientation.z = 0.0
@@ -77,28 +77,6 @@ def cb_set_datum(request):
     rospy.loginfo("gps_nav: DATUM = {}, {}".format(DATUM[0], DATUM[1]))
 
     return EmptyResponse()
-
-def _get_avg_gps(topic, count=10):
-    """
-    Get average gps signal (deault to 10)
-    """
-    subscriber = rospy.Subscriber(name=topic, data_class=NavSatFix, callback=_callback)
-
-    rate = rospy.Rate(hz=1)
-    while len(LATIS) < count+1:
-        rate.sleep()
-
-    subscriber.unregister()
-
-    latt_avg = np.mean(LATIS)
-    long_avg = np.mean(LONGS)
-
-    global LATIS, LONGS
-    LATIS = list()
-    LONGS = list()
-
-    rospy.loginfo("GPS {} signal average = {} {}".format(count, latt_avg, long_avg))
-    return (latt_avg, long_avg)
 
 if __name__ == "__main__":
 
