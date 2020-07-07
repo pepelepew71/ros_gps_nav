@@ -12,13 +12,13 @@ Make sure gps_nav datum is the same with navsat_transform_node datum.
 
 #### 1.1. Parameters
 
-```~top_gps``` (sensor_msgs/NavSatFix): gps sensor topic.
+```~top_gps``` : gps sensor topic.
 
-```~srv_init_state``` :
+```~srv_init_state``` : From ros_my_localization/init_state.py. For setting initial pose in ekf.
 
-```~srv_datum``` : navsat_transform_node set_datum service
+```~srv_datum``` : navsat_transform_node's set_datum service
 
-```~ns_move_base``` : move_base namespace
+```~ns_move_base``` : move_base's namespace
 
 #### 1.2. Published Topics
 
