@@ -26,7 +26,7 @@ def cb_record(request):
         PUB_STATUS.publish("Recording")
 
     csvtxt = rospy.get_param(param_name=PARAM_NAME_NAV_SETUP)
-    lati_avg, long_avg = utility.get_avg_gps(topic=GPS_SENSOR_TOPIC_NAME, count=10)
+    lati_avg, long_avg = utility.get_avg_gps(topic=GPS_SENSOR_TOPIC_NAME, num=10)
     csvtxt += "{0},{1},{2}\n".format(lati_avg, long_avg, 1)  # default to num 1
     rospy.set_param(param_name=PARAM_NAME_NAV_SETUP, param_value=csvtxt)
 
